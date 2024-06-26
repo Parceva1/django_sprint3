@@ -1,15 +1,21 @@
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
+
 from blog.models import Post, Category
+from .constants import recent_num_post
+
+
+def get_recent_posts():
+    return Post.objects.filter(
+        is_published=True,
+        category__is_published=True,
+        pub_date__lte=timezone.now()
+    )
 
 
 def index(request):
     template = 'blog/index.html'
-    posts = Post.objects.filter(
-        is_published=True,
-        category__is_published=True,
-        pub_date__lte=timezone.now()
-    ).order_by('-pub_date')[0:5]
+    posts = get_recent_posts().order_by('-pub_date')[:recent_num_post]
     context = {
         'post_list': posts
     }
@@ -24,11 +30,7 @@ def category_posts(request, slug):
         is_published=True,
         created_at__lte=timezone.now()
     )
-    posts = Post.objects.filter(
-        category=category,
-        is_published=True,
-        pub_date__lte=timezone.now()
-    )
+    posts = get_recent_posts().filter(category=category)
     context = {
         'category': category.title,
         'post_list': posts

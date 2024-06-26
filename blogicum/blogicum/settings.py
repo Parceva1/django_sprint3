@@ -1,7 +1,5 @@
 import os
-
 from pathlib import Path
-
 from typing import List
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
