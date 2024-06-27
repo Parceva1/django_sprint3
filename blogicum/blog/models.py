@@ -1,12 +1,30 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
-from .constants import max_length
+
+from .constants import MAX_LENGTH
+
+User = get_user_model()
 
 
-class Category(models.Model):
+class BaseModel(models.Model):
+    is_published = models.BooleanField(
+        default=True,
+        verbose_name=_('Опубликовано'),
+        help_text=_('Снимите галочку, чтобы скрыть публикацию.')
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Добавлено')
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Category(BaseModel):
     title = models.CharField(
-        max_length=max_length,
+        max_length=MAX_LENGTH,
         verbose_name=('Заголовок')
     )
     description = models.TextField(
@@ -19,15 +37,6 @@ class Category(models.Model):
                    'разрешены символы латиницы, цифры, дефис и подчёркивание.')
 
     )
-    is_published = models.BooleanField(
-        default=True,
-        verbose_name=_('Опубликовано'),
-        help_text=_('Снимите галочку, чтобы скрыть публикацию.')
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_('Добавлено')
-    )
 
     class Meta:
         verbose_name = _('категория')
@@ -37,19 +46,10 @@ class Category(models.Model):
         return self.title
 
 
-class Location(models.Model):
+class Location(BaseModel):
     name = models.CharField(
-        max_length=max_length,
+        max_length=MAX_LENGTH,
         verbose_name=_('Название места')
-    )
-    is_published = models.BooleanField(
-        default=True,
-        verbose_name=_('Опубликовано'),
-        help_text=_('Снимите галочку, чтобы скрыть публикацию.')
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_('Добавлено')
     )
 
     class Meta:
@@ -60,9 +60,9 @@ class Location(models.Model):
         return self.name
 
 
-class Post(models.Model):
+class Post(BaseModel):
     title = models.CharField(
-        max_length=max_length,
+        max_length=MAX_LENGTH,
         verbose_name=_('Название')
     )
     text = models.TextField(
@@ -74,7 +74,7 @@ class Post(models.Model):
                     ' — можно делать отложенные публикации.')
     )
     author = models.ForeignKey(
-        get_user_model(),  # Использование get_user_model()
+        User,
         on_delete=models.CASCADE,
         verbose_name=_('Автор публикации'),
         related_name='posts'
@@ -93,15 +93,6 @@ class Post(models.Model):
         null=True,
         verbose_name=_('Категория'),
         related_name='posts'
-    )
-    is_published = models.BooleanField(
-        default=True,
-        verbose_name=_('Опубликовано'),
-        help_text=_('Снимите галочку, чтобы скрыть публикацию.')
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_('Добавлено')
     )
 
     class Meta:

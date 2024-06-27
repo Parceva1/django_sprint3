@@ -1,3 +1,3 @@
-recent_num_post = 5
-max_length = 256
-list_per_page = 10
+RECENT_NUM_POST = 5
+MAX_LENGTH = 256
+LIST_PER_PAGE = 10
